@@ -160,8 +160,9 @@ var _ = (function (_) {
 					}
 				}
 			}
+		} else {
+			console.warn("Could not find command: " + command.name + " in registry. Allowing execution anyway.");
 		}
-		console.warn("Could not find command: " + command.name + " in registry. Allowing execution anyway.");
 		return true;
 	};
 
