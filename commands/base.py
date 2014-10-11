@@ -5,7 +5,6 @@ from Toolkit.plugins import *
 def build_param_message(missing_params):
 	return "The following parameters were missing: {0}".format(", ".join(missing_params))
 
-
 class Param(object):
 
 	class TYPE(Enum):
@@ -49,7 +48,7 @@ class Param(object):
 	be overridden in each of the command handlers in order actually process a request.
 '''
 @Plugin(key='command_name', module='commands')
-class CommandHandlerBase(AjaxMixin):
+class CommandHandlerBase(_AjaxMixin):
 
 	# the canonical name for the command
 	command_name = ''

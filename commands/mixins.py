@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 
 
-class AjaxMixin(object):
+class _AjaxMixin(object):
 
 	@classmethod
 	def success(cls, results, meta=None, status=200):

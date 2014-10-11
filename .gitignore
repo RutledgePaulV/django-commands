@@ -1,1 +1,9 @@
-# Created by .gitignore support plugin (hsz.mobi)
+/.idea
+*.iml
+*.ipr
+*.iws
+out/
+.idea_modules/
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
+*.pyc

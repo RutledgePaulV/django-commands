@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, url
-
 from .views import *
 
 # Defining routes that apply to the command app.

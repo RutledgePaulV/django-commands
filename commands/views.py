@@ -1,11 +1,12 @@
 from django.views.generic import View
 from .services import *
+from .mixins import *
 
 '''
 	This controller is responsible for receiving commands to execute
 	and appropriately dispatching them to the correct handler strategy.
 '''
-class CommandHandler(View, AjaxMixin):
+class CommandHandler(View, _AjaxMixin):
 
 	service = CommandService()
 
@@ -23,7 +24,7 @@ class CommandHandler(View, AjaxMixin):
 	front end so that it can perform validation before a command is actually
 	executed, thus preventing server errors due to malformed requests.
 '''
-class AllCommandDefinitions(View, AjaxMixin):
+class AllCommandDefinitions(View, _AjaxMixin):
 
 	service = CommandService()
 
@@ -40,7 +41,7 @@ class AllCommandDefinitions(View, AjaxMixin):
 	that are available to a particular user based on their authentication
 	and various permissions.
 '''
-class AvailableCommandDefinitions(View, AjaxMixin):
+class AvailableCommandDefinitions(View, _AjaxMixin):
 
 	service = CommandService()
 
