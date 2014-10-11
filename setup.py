@@ -1,27 +1,38 @@
 import os
 from setuptools import setup
 
-def read(file_name):
-	return open(os.path.join(os.path.dirname(__file__), file_name)).read()
+with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
+	README = readme.read()
+
+# allow setup.py to be run from any path
+os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
 	name="django-commands",
-	version="0.0.1",
+	version="0.1",
 	author="Paul Rutledge",
 	author_email="paul.v.rutledge@gmail.com",
 	description="A django app that provides a plugin type model for integrating the front and backend.",
 	license="BSD",
 	keywords="django command strategy plugin",
 	url="https://github.com/RutledgePaulV/django-commands",
+	include_package_data=True,
+	long_description=README,
 	packages=["commands", "tests"],
-	long_description=read('README'),
 	dependency_links=[
 		"git+https://github.com/RutledgePaulV/django-toolkit"
 	],
 	classifiers=[
-		"Development Status :: 2 - Pre-Alpha",
-		"Framework :: Django",
-		"Topic :: Utilities",
-		"License :: OSI Approved :: BSD License",
+		'Environment :: Web Environment',
+		'Framework :: Django',
+		'Intended Audience :: Developers',
+		'License :: OSI Approved :: BSD License',
+		'Operating System :: OS Independent',
+		'Programming Language :: Python',
+		'Programming Language :: Python :: 3',
+		'Programming Language :: Python :: 3.2',
+		'Programming Language :: Python :: 3.3',
+		'Topic :: Internet :: WWW/HTTP',
+		'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
 	],
 )
