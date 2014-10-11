@@ -1,6 +1,6 @@
 from enum import Enum
 from .mixins import *
-from Toolkit.plugins import *
+from toolkit.plugins import *
 
 def build_param_message(missing_params):
 	return "The following parameters were missing: {0}".format(", ".join(missing_params))

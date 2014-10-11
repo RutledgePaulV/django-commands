@@ -1,6 +1,6 @@
 from .base import *
 from .mixins import *
-from Toolkit.singleton import *
+from toolkit.singleton import *
 
 '''
 	This service exists to index the available commands by scanning the commands package and
