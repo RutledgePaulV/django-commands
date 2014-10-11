@@ -9,7 +9,7 @@ from toolkit.singleton import *
 '''
 
 @Singleton
-class CommandService(_AjaxMixin):
+class CommandService(AjaxMixin):
 
 	# the name of the field at which command handlers should specify their callable name.
 	command_name_field = 'command_name'

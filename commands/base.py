@@ -48,7 +48,7 @@ class Param(object):
 	be overridden in each of the command handlers in order actually process a request.
 '''
 @Plugin(key='command_name', module='commands')
-class CommandHandlerBase(_AjaxMixin):
+class CommandHandlerBase(AjaxMixin):
 
 	# the canonical name for the command
 	command_name = ''

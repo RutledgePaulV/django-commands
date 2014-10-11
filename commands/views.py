@@ -6,7 +6,7 @@ from .mixins import *
 	This controller is responsible for receiving commands to execute
 	and appropriately dispatching them to the correct handler strategy.
 '''
-class CommandHandler(View, _AjaxMixin):
+class CommandHandler(View, AjaxMixin):
 
 	service = CommandService()
 
@@ -24,7 +24,7 @@ class CommandHandler(View, _AjaxMixin):
 	front end so that it can perform validation before a command is actually
 	executed, thus preventing server errors due to malformed requests.
 '''
-class AllCommandDefinitions(View, _AjaxMixin):
+class AllCommandDefinitions(View, AjaxMixin):
 
 	service = CommandService()
 
@@ -41,7 +41,7 @@ class AllCommandDefinitions(View, _AjaxMixin):
 	that are available to a particular user based on their authentication
 	and various permissions.
 '''
-class AvailableCommandDefinitions(View, _AjaxMixin):
+class AvailableCommandDefinitions(View, AjaxMixin):
 
 	service = CommandService()
 
