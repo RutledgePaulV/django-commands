@@ -76,11 +76,11 @@ class MyCommandHandler(CommandHandlerBase):
         if instances.exists():
             instance = instances[0]
             instance.message = command_data['message']
+            instance.sum = sum(command_data['counts'])
             instance.save()
             return self.success({'responseMessage':'Woohoo! You win!'})
         else:
-            incremented = [(count+1) for count in command_data['counts']]
-            return self.error({'responseMessage': 'You suck!', 'incrementedCounts': incremented})
+            return self.error("An error message")
 ```
 
 ### Include Static Files
@@ -96,30 +96,29 @@ assume that you are already using jQuery.
 
 // this will make the front-end aware of all the available
 // commands that you've defined in commands.py files across
-// all of your apps.
+// all of your apps. All available commands (based on user permissions
+// and authentication status will be populated into _.registry
 _.UpdateDefinition();
 
 // this will attempt to post the command to your handler,
 // but first it will do some checks to make sure you have
 // the required data parameters and that they are of the
 // right type. This validation occurs on the front end
-// and on the backend. This call will error out.
+// and on the backend. This call without data won't work
+// for the command that we defined.
 _.registry.SOME_CANONICAL_COMMAND_NAME.fire();
-
-
 
 // defining legitimate data
 var data = {number: 5, message: 'my message', counts: [5,6,7]};
 
 // if status==200 on the response (they called return self.success())
 var successHandler = function(data){
-	alert(data.responseMessage); // alerts Woohoo! You Win!
+	alert(data.results[0].responseMessage); // alerts Woohoo! You Win!
 }
 
 // if status!=200 on the response (they called return self.error() or validation failed)
 var errorHandler = function(data){
-	alert(data.responseMessage);
-	alert(data.incrementedCounts);
+	alert(data.error);
 }
 
 // making the actual call with data and callbacks
