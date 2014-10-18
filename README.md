@@ -51,14 +51,24 @@ from .models import *
 
 class MyCommandHandler(CommandHandlerBase):
 
+	# the name of the command
 	command_name = 'SOME_CANONICAL_COMMAND_NAME'
 
+	# parameters that are required in order to be considered a valid command request
 	params = [
 		Param('number', Param.TYPE.NUMBER),
 		Param('message', Param.TYPE.STRING),
 		Param('counts', Param.TYPE.NUMBER_ARRAY)
 	]
 
+	# request won't even make it to the handle method if they aren't authenticated
+    auth_required = True
+    
+    # request won't even make it to the handle method if they don't have the permissions listed.
+    required_permissions = ['superuser']
+    
+    # if all validation based on the static fields passes, then this class is instantiated
+    # and the request and the appropriate data is passed into the command_data
 	def handle(self, request, command_data):
    
         instances = MyModel.objects.filter(number = command_data['number'])
