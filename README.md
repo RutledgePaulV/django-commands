@@ -1,7 +1,9 @@
 ## What
 django-commands is a reusable django app that helps solidify and
 simplify the process of writing client-side and server-side
-code for communicating between the two via ajax.
+code for communicating between the two via ajax. A command
+handler is a replacement for the standard django view and
+is intended to deal strictly with ajax in json format.
 
 ## How
 by using a plugin-architecture and auto-discovery of modules across
@@ -9,12 +11,15 @@ your existing apps, it removes the need to have a separate view for
 each ajax process and allows operations to be more driven by the business
 logic of the application and less tied to models and views.
 
-
 ## Why
 ajax gets messy and model bound restful API routes are in some cases not
-the best solution for applications with more complex business logic.
-
-
+the best solution for applications with more complex business logic. Rather
+than struggling through the boilerplate view definition and basic validation
+of a request django-commands allows you to focus solely on your business logic
+because you can be sure that anything that reaches your #handle method was
+definitely valid in terms of parameter existence, parameter type, user authentication,
+and user permissions. It's only up to you to decide if it's valid based on model 
+existence and your business rules.
 
 ## Installation
 
@@ -41,9 +46,10 @@ url(r'^commands/', include('commands.urls', namespace='commands')),
 ```
 
 ### Create Command Handler
-Inside one of your custom apps, create a file `commands.py`
+Inside your custom apps where you want to use commands, create a file `commands.py`
 
-Inside of that file:
+Inside of that file you define your logic for all the commands you want available for that application. I've given
+a simple example below.
 
 ```python
 from commands.base import *
