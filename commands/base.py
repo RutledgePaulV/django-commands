@@ -120,11 +120,11 @@ class CommandHandlerBase(AjaxMixin):
 				elif param.type == Param.TYPE.OBJECT:
 					resultant_typed_params[param.name] = dict(values[0])
 				elif param.type == Param.TYPE.NUMBER_ARRAY:
-					resultant_typed_params[param.name] = map(float, values)
+					resultant_typed_params[param.name] = list(map(float, values))
 				elif param.type == Param.TYPE.STRING_ARRAY:
-					resultant_typed_params[param.name] = map(str, values)
+					resultant_typed_params[param.name] = list(map(str, values))
 				elif param.type == Param.TYPE.OBJECT_ARRAY:
-					resultant_typed_params[param.name] = map(dict, values)
+					resultant_typed_params[param.name] = list(map(dict, values))
 				else:
 					invalid.append(param.name)
 			except TypeError:
