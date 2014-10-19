@@ -125,7 +125,7 @@ var _ = (function (_) {
 	 * @returns {object}
 	 */
 	_.stringifyApplicable = $.proxy(function(data){
-		var resultData = {};
+		var resultData = data;
 		var regDefinition = this.registry[data.command];
 
 		for(var key in regDefinition.params){

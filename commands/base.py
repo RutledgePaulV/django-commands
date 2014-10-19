@@ -1,6 +1,7 @@
 from enum import Enum
 from .mixins import *
 from toolkit.plugins import *
+import json
 
 def build_param_message(missing_params):
 	return "The following parameters were missing: {0}".format(", ".join(missing_params))
@@ -30,10 +31,23 @@ class Param(object):
 		self.required = required
 
 	@property
+	def is_multipart(self):
+		return self.type == Param.TYPE.BLOB_ARRAY or self.type == Param.TYPE.FILE_ARRAY
+
+	@property
+	def key(self):
+		return "{0}[]".format(self.name) if self.is_multipart else self.name
+
+	@property
 	def is_serialized(self):
-		return (self.type == self.TYPE.NUMBER_ARRAY) or \
-			   (self.type == self.TYPE.STRING_ARRAY) or \
-			   (self.type == self.TYPE.OBJECT_ARRAY)
+		return self.type in [
+			Param.TYPE.NUMBER,
+			Param.TYPE.STRING,
+			Param.TYPE.OBJECT,
+			Param.TYPE.NUMBER_ARRAY,
+			Param.TYPE.STRING_ARRAY,
+			Param.TYPE.OBJECT_ARRAY
+		]
 
 	def dictify(self):
 		definition = {'name': self.name, 'type': self.type.value, 'required': self.required}
@@ -90,7 +104,7 @@ class CommandHandlerBase(AjaxMixin):
 	# checks that the necessary parameters were provided with the command data
 	@classmethod
 	def validate_param_existence(cls, command_data):
-		missing = [param.name for param in cls.params if (param.required) and (param.name not in command_data)]
+		missing = [param.name for param in cls.params if (param.required) and (param.key not in command_data)]
 		if len(missing) > 0: return False, build_param_message(missing)
 		return True, ''
 
@@ -105,19 +119,31 @@ class CommandHandlerBase(AjaxMixin):
 	@classmethod
 	def validate_param_types(cls, command_data):
 		invalid = []
-		existing = [param for param in cls.params if param.key in command_data]
 		resultant_typed_params = {}
+		existing = [param for param in cls.params if param.key in command_data]
 		for param in existing:
-			# important! using getlist allows us to post multipart form values
-			# without having to do any stringify operations on FE or BE
-			values = command_data.getlist(param.key)
+
+			# getting the appropriate version of the request
+			if param.is_multipart:
+				values = command_data.getlist(param.key)
+			else:
+				values = json.loads(command_data[param.key])
+
 			try:
-				if param.type == Param.TYPE.NUMBER:
-					resultant_typed_params[param.name] = float(values[0])
+				if param.type == Param.TYPE.BLOB:
+					resultant_typed_params[param.name] = values
+				elif param.type == Param.TYPE.FILE:
+					resultant_typed_params[param.name] = values
+				elif param.type == Param.TYPE.NUMBER:
+					resultant_typed_params[param.name] = float(values)
 				elif param.type == Param.TYPE.STRING:
-					resultant_typed_params[param.name] = str(values[0])
+					resultant_typed_params[param.name] = str(values)
 				elif param.type == Param.TYPE.OBJECT:
-					resultant_typed_params[param.name] = dict(values[0])
+					resultant_typed_params[param.name] = dict(values)
+				elif param.type == Param.TYPE.BLOB_ARRAY:
+					resultant_typed_params[param.name] = list(values)
+				elif param.type == Param.TYPE.FILE_ARRAY:
+					resultant_typed_params[param.name] = list(values)
 				elif param.type == Param.TYPE.NUMBER_ARRAY:
 					resultant_typed_params[param.name] = list(map(float, values))
 				elif param.type == Param.TYPE.STRING_ARRAY:
