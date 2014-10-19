@@ -25,6 +25,16 @@ class Param(object):
 		self.default = default
 		self.required = required
 
+	@property
+	def is_array(self):
+		return (self.type == self.TYPE.NUMBER_ARRAY) or \
+			   (self.type == self.TYPE.STRING_ARRAY) or \
+			   (self.type == self.TYPE.OBJECT_ARRAY)
+
+	@property
+	def key(self):
+		return self.name if not self.is_array else "{0}[]".format(self.name)
+
 	def dictify(self):
 		definition = {'name': self.name, 'type': self.type.value, 'required': self.required}
 		if self.default:
@@ -81,7 +91,7 @@ class CommandHandlerBase(AjaxMixin):
 	# checks that the necessary parameters were provided with the command data
 	@classmethod
 	def validate_param_existence(cls, command_data):
-		missing = [param.name for param in cls.params if (param.required) and (param.name not in command_data)]
+		missing = [param.name for param in cls.params if (param.required) and (param.key not in command_data)]
 		if len(missing) > 0: return False, build_param_message(missing)
 		return True, ''
 
@@ -96,12 +106,12 @@ class CommandHandlerBase(AjaxMixin):
 	@classmethod
 	def validate_param_types(cls, command_data):
 		invalid = []
-		existing = [param for param in cls.params if param.name in command_data]
+		existing = [param for param in cls.params if param.key in command_data]
 		resultant_typed_params = {}
 		for param in existing:
 			# important! using getlist allows us to post multipart form values
 			# without having to do any stringify operations on FE or BE
-			values = command_data.getlist(param.name)
+			values = command_data.getlist(param.key)
 			try:
 				if param.type == Param.TYPE.NUMBER or param.type == Param.TYPE.NUMBER_ARRAY:
 					resultant_typed_params[param.name] = float(values[0])

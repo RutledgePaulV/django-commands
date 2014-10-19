@@ -66,10 +66,9 @@ class CommandService(AjaxMixin):
 		if not valid: return self.error(message, 400)
 		# End valid request data check
 
-		# Lastly, check that the type of the included parameters is as expected
-		# and we also convert the values to those types
+		# Lastly, try to build an object with the right data types and attribtute names
 		valid, result = handler_class.validate_param_types(command_data)
-		if not valid: return self.error(message, 400)
+		if not valid: return self.error(result, 400)
 
 		# creating an object with an attribute for each of the command params
 		data = type(command_name, (object,), result)()
