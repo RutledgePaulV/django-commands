@@ -19,6 +19,10 @@ var _ = (function (_) {
 		 * @enum
 		 */
 		TYPES: {
+			'blob': [Blob],
+			'blob[]': [Array, Blob],
+			'file': [File],
+			'file[]': [Array, File],
 			'string': [String],
 			'string[]': [Array, String],
 			'number': [Number],
@@ -62,7 +66,6 @@ var _ = (function (_) {
 					}
 				}
 			}
-
 			return true;
 		}
 	};

@@ -67,6 +67,8 @@ var _ = (function (_) {
 
 		if (this._validateCommand(command, data)) {
 
+			data = this._stringifyApplicable(data);
+
 			// If no success function was given, let's just print it to the console.
 			if (!success) {
 				success = function (data) {
@@ -111,6 +113,36 @@ var _ = (function (_) {
 		message += "\nThe provided data was: " + JSON.stringify(data);
 
 		return message;
+	}, _);
+
+	/**
+	 * This method stringifies fields on the data for the command POST that
+	 * would otherwise be interpreted incorrectly. We only stringify a subset
+	 * of the fields so that you can still post things like binary data via a
+	 * command.
+	 *
+	 * @param {object}
+	 * @returns {object}
+	 */
+	_.stringifyApplicable = $.proxy(function(data){
+		var resultData = {};
+		var regDefinition = this.registry[data.command];
+
+		for(var key in regDefinition.params){
+			var param = regDefinition.params[key];
+			switch(param.type){
+				case 'blob':
+				case 'blob[]':
+				case 'file':
+				case 'file[]':
+					resultData[param.name] = data[param.name];
+					break;
+				default:
+					resultData[param.name] = JSON.stringify(data[param.name]);
+			}
+		}
+
+		return resultData;
 	}, _);
 
 	/**

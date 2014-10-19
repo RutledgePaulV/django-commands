@@ -12,9 +12,13 @@ def build_param_type_message(invalid_params):
 class Param(object):
 
 	class TYPE(Enum):
+		BLOB = 'blob'
+		FILE = 'file'
 		NUMBER = 'number'
 		STRING = 'string'
 		OBJECT = 'object'
+		BLOB_ARRAY = 'blob[]'
+		FILE_ARRAY = 'file[]'
 		NUMBER_ARRAY = 'number[]'
 		STRING_ARRAY = 'string[]'
 		OBJECT_ARRAY = 'object[]'
@@ -26,19 +30,14 @@ class Param(object):
 		self.required = required
 
 	@property
-	def is_array(self):
+	def is_serialized(self):
 		return (self.type == self.TYPE.NUMBER_ARRAY) or \
 			   (self.type == self.TYPE.STRING_ARRAY) or \
 			   (self.type == self.TYPE.OBJECT_ARRAY)
 
-	@property
-	def key(self):
-		return self.name if not self.is_array else "{0}[]".format(self.name)
-
 	def dictify(self):
 		definition = {'name': self.name, 'type': self.type.value, 'required': self.required}
-		if self.default:
-			definition['default'] = self.default
+		if self.default: definition['default'] = self.default
 		return definition
 
 
@@ -91,7 +90,7 @@ class CommandHandlerBase(AjaxMixin):
 	# checks that the necessary parameters were provided with the command data
 	@classmethod
 	def validate_param_existence(cls, command_data):
-		missing = [param.name for param in cls.params if (param.required) and (param.key not in command_data)]
+		missing = [param.name for param in cls.params if (param.required) and (param.name not in command_data)]
 		if len(missing) > 0: return False, build_param_message(missing)
 		return True, ''
 

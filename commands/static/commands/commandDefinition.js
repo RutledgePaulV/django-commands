@@ -1,3 +1,10 @@
+/**
+ * This file adds to the _ module a class definition for the _.Command
+ * type which represents an executable command. Typically these will be
+ * defined by the server to the front-end via _.UpdateDefinitions();
+ *
+ * @module _
+ */
 var _ = (function (_) {
 
 	/**
