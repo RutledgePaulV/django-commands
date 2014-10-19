@@ -67,7 +67,7 @@ var _ = (function (_) {
 
 		if (this._validateCommand(command, data)) {
 
-			data = this._stringifyApplicable(data);
+			data = this.stringifyApplicable(data);
 
 			// If no success function was given, let's just print it to the console.
 			if (!success) {

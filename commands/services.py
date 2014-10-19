@@ -39,36 +39,36 @@ class CommandService(AjaxMixin):
 
 		# make sure they actually specified a command in the request
 		if not 'command' in request.POST:
-			return self.error("No command parameter was received.", 400)
+			return self.error("No command parameter was received.", status=400)
 
 		# retrieving the name of the command
 		command_name = command_data.pop('command')[0]
 
 		# make sure a valid handler strategy exists.
 		if not self.has_handler(command_name):
-			return self.error("No command handler exists for the requested command", 400)
+			return self.error("No command handler exists for the requested command", status=400)
 
 		# retrieving the class for the command handler
 		handler_class = self.get_handler(command_name)
 
 		# First, check if the user needs to be authenticated
 		if not handler_class.validate_auth(request):
-			return self.error("You must be an authenticated user to perform the requested command.", 401)
+			return self.error("You must be an authenticated user to perform the requested command.", status=401)
 		# End authentication check.
 
 		# Next, check will be for the necessary permissions
 		if not handler_class.validate_permissions(request):
-			return self.error("Your user does not have the correct permissions for the requested command.", 403)
+			return self.error("Your user does not have the correct permissions for the requested command.", status=403)
 		# End permissions check.
 
 		# Next, check if required request parameters exist for the command
 		valid, message = handler_class.validate_param_existence(command_data)
-		if not valid: return self.error(message, 400)
+		if not valid: return self.error(message, status=400)
 		# End valid request data check
 
-		# Lastly, try to build an object with the right data types and attribtute names
+		# Lastly, try to build an object with the right data types and attribute names
 		valid, result = handler_class.validate_param_types(command_data)
-		if not valid: return self.error(result, 400)
+		if not valid: return self.error(result, status=400)
 
 		# creating an object with an attribute for each of the command params
 		data = type(command_name, (object,), result)()
