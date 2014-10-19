@@ -135,10 +135,10 @@ var _ = (function (_) {
 				case 'blob[]':
 				case 'file':
 				case 'file[]':
-					resultData[param.name] = data[param.name];
+					resultData[key] = data[key];
 					break;
 				default:
-					resultData[param.name] = JSON.stringify(data[param.name]);
+					resultData[key] = JSON.stringify(data[key]);
 			}
 		}
 
