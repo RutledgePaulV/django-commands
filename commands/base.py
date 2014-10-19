@@ -5,6 +5,8 @@ from toolkit.plugins import *
 def build_param_message(missing_params):
 	return "The following parameters were missing: {0}".format(", ".join(missing_params))
 
+def build_param_type_message(invalid_params):
+	return "The following parameters were of the wrong type: {0}".format(", ".join())
 class Param(object):
 
 	class TYPE(Enum):
@@ -76,7 +78,7 @@ class CommandHandlerBase(AjaxMixin):
 
 	# checks that the necessary parameters were provided with the command data
 	@classmethod
-	def validate_params(cls, command_data):
+	def validate_param_existence(cls, command_data):
 		missing = [param.name for param in cls.params if (param.required) and (param.name not in command_data)]
 		if len(missing) > 0: return False, build_param_message(missing)
 		return True, ''
@@ -86,6 +88,35 @@ class CommandHandlerBase(AjaxMixin):
 	@classmethod
 	def to_definition(cls):
 		return {'name': cls.command_name, 'params': [param.dictify() for param in cls.params]}
+
+
+	# checks that all of the parameters in the request are of the correct type
+	@classmethod
+	def validate_param_types(cls, command_data):
+		invalid = []
+		existing = [param for param in cls.params if param.name in command_data]
+		resultant_typed_params = {}
+		for param in existing:
+			value = command_data[param.name]
+			try:
+				if param.type == Param.TYPE.NUMBER:
+					resultant_typed_params[param.name] = float(value)
+				elif param.type == Param.TYPE.STRING:
+					resultant_typed_params[param.name] = str(value)
+				elif param.type == Param.TYPE.OBJECT:
+					resultant_typed_params[param.name] = dict(value)
+				elif param.type == Param.TYPE.NUMBER_ARRAY:
+					resultant_typed_params[param.name] = map(float, list(value))
+				elif param.type == Param.TYPE.STRING_ARRAY:
+					resultant_typed_params[param.name] = map(str, list(value))
+				elif param.type == Param.TYPE.OBJECT_ARRAY:
+					resultant_typed_params[param.name] = map(dict, list(value))
+				else:
+					invalid.append(param.name)
+			except TypeError:
+				invalid.append(param.name)
+		if len(invalid) > 0: return False, build_param_type_message(invalid)
+		else: return True, resultant_typed_params
 
 
 	# just a placeholder, but implementations should handle the actual incoming command and return a HTTP response

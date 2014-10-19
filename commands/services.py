@@ -61,10 +61,20 @@ class CommandService(AjaxMixin):
 			return self.error("Your user does not have the correct permissions for the requested command.", 403)
 		# End permissions check.
 
-		# Lastly, check if request data is valid for the handler
-		valid, message = handler_class.validate_params(command_data)
+		# Next, check if required request parameters exist for the command
+		valid, message = handler_class.validate_param_existence(command_data)
 		if not valid: return self.error(message, 400)
 		# End valid request data check
+
+		# Lastly, check that the type of the included parameters is as expected
+		# and we also convert the values to those types
+		valid, result = handler_class.validate_param_types(command_data)
+		if not valid:
+			message = result
+			return self.error(message, 400)
+
+		# creating an object with an attribute for each of the command params
+		data = type(command_name, (object,), result)()
 
 		'''
 			Once we get here, everything that can be known outside of the specific business logic
@@ -72,9 +82,8 @@ class CommandService(AjaxMixin):
 			succeed, but that part must be handled by the command handler itself and cannot be
 			reasonably determined via meta-data from the static context.
 		'''
-
 		# nothing more can be done off of the static class definition, so go ahead and instantiate
 		handler = handler_class()
 
 		# pass responsibility off to the actual handle method
-		return handler.handle(request, command_data)
+		return handler.handle(request, data)
