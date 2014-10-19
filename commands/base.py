@@ -113,7 +113,7 @@ class CommandHandlerBase(AjaxMixin):
 			# without having to do any stringify operations on FE or BE
 			values = command_data.getlist(param.key)
 			try:
-				if param.type == Param.TYPE.NUMBER or param.type == Param.TYPE.NUMBER_ARRAY:
+				if param.type == Param.TYPE.NUMBER:
 					resultant_typed_params[param.name] = float(values[0])
 				elif param.type == Param.TYPE.STRING:
 					resultant_typed_params[param.name] = str(values[0])
