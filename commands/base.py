@@ -6,7 +6,9 @@ def build_param_message(missing_params):
 	return "The following parameters were missing: {0}".format(", ".join(missing_params))
 
 def build_param_type_message(invalid_params):
-	return "The following parameters were of the wrong type: {0}".format(", ".join())
+	return "The following parameters were of the wrong type: {0}".format(", ".join(invalid_params))
+
+
 class Param(object):
 
 	class TYPE(Enum):
@@ -97,20 +99,22 @@ class CommandHandlerBase(AjaxMixin):
 		existing = [param for param in cls.params if param.name in command_data]
 		resultant_typed_params = {}
 		for param in existing:
-			value = command_data[param.name]
+			# important! using getlist allows us to post multipart form values
+			# without having to do any stringify operations on FE or BE
+			values = command_data.getlist(param.name)
 			try:
-				if param.type == Param.TYPE.NUMBER:
-					resultant_typed_params[param.name] = float(value)
+				if param.type == Param.TYPE.NUMBER or param.type == Param.TYPE.NUMBER_ARRAY:
+					resultant_typed_params[param.name] = float(values[0])
 				elif param.type == Param.TYPE.STRING:
-					resultant_typed_params[param.name] = str(value)
+					resultant_typed_params[param.name] = str(values[0])
 				elif param.type == Param.TYPE.OBJECT:
-					resultant_typed_params[param.name] = dict(value)
+					resultant_typed_params[param.name] = dict(values[0])
 				elif param.type == Param.TYPE.NUMBER_ARRAY:
-					resultant_typed_params[param.name] = map(float, list(value))
+					resultant_typed_params[param.name] = map(float, values)
 				elif param.type == Param.TYPE.STRING_ARRAY:
-					resultant_typed_params[param.name] = map(str, list(value))
+					resultant_typed_params[param.name] = map(str, values)
 				elif param.type == Param.TYPE.OBJECT_ARRAY:
-					resultant_typed_params[param.name] = map(dict, list(value))
+					resultant_typed_params[param.name] = map(dict, values)
 				else:
 					invalid.append(param.name)
 			except TypeError:
