@@ -1,18 +1,20 @@
 ## What
-django-commands is a reusable django app that helps solidify and
+Django-commands is a reusable django app that helps idiot-proof and
 simplify the process of writing client-side and server-side
-code for communicating between the two via ajax. A command
-handler is a replacement for the standard django view and
-is intended to deal strictly with ajax in json format.
+code for communicating via ajax. A command handler is a replacement 
+for the standard django view and is intended to deal strictly with ajax 
+requests in json format.
 
 ## How
-by using a plugin-architecture and auto-discovery of modules across
-your existing apps, it removes the need to have a separate view for
-each ajax process and allows operations to be more driven by the business
-logic of the application and less tied to models and views.
+By using a plugin-architecture and auto-discovery of modules across
+your existing apps, django-commands removes the need to have the same 
+sort of redundant boilerplate validation for views intended to handle ajax requests.
+Ultimately, it allows operations to be more driven by the business
+logic of the application and less bound to models like what is often
+seen when taking a RESTful approach.
 
 ## Why
-ajax gets messy and model bound restful API routes are in some cases not
+Ajax gets messy and model bound restful API routes are in some cases not
 the best solution for applications with more complex business logic. Rather
 than struggling through the boilerplate view definition and basic validation
 of a request django-commands allows you to focus solely on your business logic
@@ -20,6 +22,27 @@ because you can be sure that anything that reaches your #handle method was
 definitely valid in terms of parameter existence, parameter type, user authentication,
 and user permissions. It's only up to you to decide if it's valid based on model 
 existence and your business rules.
+
+## Goals
+- Do not impede performance to any sort of noticeable level.
+- Keep the implementation of a command handler simple, explicit, and elegant.
+- Make command strategy a viable approach to doing rapid and robust web development with django.
+- Should be no reason to have to venture outside of the command handler strategy for any
+  form posts or ajax procedures within an application.
+- Allow commands to take arbitrary amount of keys consisting of data of 
+  the following types and correctly upload them, pass thorough validation, 
+  and reach the handler in a directly usable format.
+  - String
+  - String Arrays
+  - Number
+  - Number Arrays
+  - Object*
+  - Object* Arrays
+  - File
+  - File Arrays
+  - Blob
+  - Blob Arrays
+_*Object types consist of a standard JavaScript object that combines any number of the other types using string keys_
 
 ## Installation
 
@@ -131,7 +154,6 @@ var errorHandler = function(data){
 _.registry.SOME_CANONICAL_COMMAND_NAME.fire(data, successHandler, errorHandler);
 
 ```
-
 
 ## License
 Copyright (c) 2014, Paul V Rutledge
