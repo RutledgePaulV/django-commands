@@ -18,24 +18,6 @@ class CommandHandler(View, AjaxMixin):
 		# dispatch the request to the appropriate handler along with a mutable copy of the POST contents
 		return self.service.dispatch(request, request.POST.copy())
 
-
-'''
-	This controller is responsible for describing the various commands to the
-	front end so that it can perform validation before a command is actually
-	executed, thus preventing server errors due to malformed requests.
-'''
-class AllCommandDefinitions(View, AjaxMixin):
-
-	service = CommandService()
-
-	def get(self, request, *args, **kwargs):
-		all_commands = self.service.get_all_definitions()
-		return self.success(all_commands)
-
-	def post(self, request, *args, **kwargs):
-		return self.error("Post requests are not supported for this endpoint.")
-
-
 '''
 	This controller is responsible for describing the commands
 	that are available to a particular user based on their authentication

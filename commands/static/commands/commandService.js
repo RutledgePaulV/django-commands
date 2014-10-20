@@ -11,7 +11,6 @@
 var _ = (function (_) {
 
 	_.Endpoints = {
-		all: '',
 		available: '',
 		execution: ''
 	};
@@ -32,9 +31,8 @@ var _ = (function (_) {
 	 * cache that is used to validate commands before they are sent to the server.
 	 *
 	 * @param {function} [ready] A callback that gets fired after the command definitions have been loaded.
-	 * @param {string} [uriEndpoint] An optional alternative endpoint from which to populate the commands.
 	 */
-	_.UpdateDefinitions = function (ready, uriEndpoint) {
+	_.UpdateDefinitions = function (ready) {
 		this.registry = {};
 		var done = $.proxy(this._doneUpdatingCallback, this);
 
@@ -45,7 +43,7 @@ var _ = (function (_) {
 			}
 		};
 
-		$.get(uriEndpoint || _.Endpoints.available).done(callback).fail(this._errorUpdatingCallback);
+		$.get(_.Endpoints.available).done(callback).fail(this._errorUpdatingCallback);
 	};
 
 	/**
