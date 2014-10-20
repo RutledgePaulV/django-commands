@@ -14,12 +14,12 @@ logic of the application and less bound to models like what is often
 seen when taking a RESTful approach.
 
 ## Why
-Ajax gets messy and model bound restful API routes are in some cases not
+Ajax gets messy and model-bound API routes are not always
 the best solution for applications with more complex business logic. Rather
 than struggling through the boilerplate view definition and basic validation
-of a request django-commands allows you to focus solely on your business logic
+of a request, django-commands allows you to focus solely on your business logic
 because you can be sure that anything that reaches your #handle method was
-definitely valid in terms of parameter existence, parameter type, user authentication,
+valid in terms of parameter existence, parameter type, user authentication,
 and user permissions. It's only up to you to decide if it's valid based on model 
 existence and your business rules.
 
@@ -29,6 +29,12 @@ existence and your business rules.
 - Make command strategy a viable approach to doing rapid and robust web development with django.
 - Should be no reason to have to venture outside of the command handler strategy for any
   form posts or ajax procedures within an application.
+- Perform thorough validation of a request on front-end and back-end so that
+  developers get immediate and telling feedback.
+- Keep JavaScript lightweight and follow best practices regarding defining
+  a library.
+- Write clean, robust, well-documented, and well-tested code that makes
+  django-commands more than a one-off project.
 - Allow commands to take arbitrary amount of keys consisting of data of 
   the following types and correctly upload them, pass thorough validation, 
   and reach the handler in a directly usable format.
@@ -42,6 +48,7 @@ existence and your business rules.
   - File Arrays
   - Blob
   - Blob Arrays
+
 _*Object types consist of a standard JavaScript object that combines any number of the other types using string keys_
 
 ## Installation
@@ -63,7 +70,9 @@ INSTALLED_APPS = (
 ## Usage
 
 ### Setup Routes
-Add this one line to your root urls.py
+Add this one line to your root urls.py. You can change the actual route if you want and
+the correct endpoints will still be set inside the client-side code, just don't change the 
+namespace. 
 ```python
 url(r'^commands/', include('commands.urls', namespace='commands')),
 ```
@@ -98,18 +107,18 @@ class MyCommandHandler(CommandHandlerBase):
     
     # if all validation based on the static fields passes, then this class is instantiated
     # and the request and the appropriate data is passed into the command_data
-	def handle(self, request, command_data):
+	def handle(self, request, data):
    
-        instances = MyModel.objects.filter(number = command_data['number'])
+        instances = MyModel.objects.filter(number = data.number)
         
         if instances.exists():
             instance = instances[0]
-            instance.message = command_data['message']
-            instance.sum = sum(command_data['counts'])
+            instance.message = data.message
+            instance.sum = sum(data.counts)
             instance.save()
-            return self.success({'responseMessage':'Woohoo! You win!'})
+            return self.success({'responseMessage': 'Woohoo! You win!'})
         else:
-            return self.error("An error message")
+            return self.error("No model existed for the provided number.")
 ```
 
 ### Include Static Files
@@ -138,7 +147,7 @@ _.UpdateDefinition();
 _.registry.SOME_CANONICAL_COMMAND_NAME.fire();
 
 // defining legitimate data
-var data = {number: 5, message: 'my message', counts: [5,6,7]};
+var data = {number: 5, message: 'my message', counts: [5, 6, 7]};
 
 // if status==200 on the response (they called return self.success())
 var successHandler = function(data){
