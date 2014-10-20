@@ -17,7 +17,7 @@ class AjaxMixin(object):
 		return JsonResponse(content, status=status)
 
 	@classmethod
-	def error(cls, message, meta=None, status=405):
-		content = {'error': message}
+	def error(cls, message, meta=None, status=400):
+		content = {'error': str(message)}
 		if meta: content.update(meta)
 		return JsonResponse(content, status=status)

@@ -25,8 +25,10 @@ var _ = (function (_) {
 			'file[]': [Array, File],
 			'string': [String],
 			'string[]': [Array, String],
-			'number': [Number],
-			'number[]': [Array, Number],
+			'integer': [Number],
+			'integer[]': [Array, Number],
+			'float': [Number],
+			'float[]': [Array, Number],
 			'object': [Object],
 			'object[]': [Array, Object]
 		},

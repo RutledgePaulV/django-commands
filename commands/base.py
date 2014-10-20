@@ -1,6 +1,7 @@
 from enum import Enum
 from .mixins import *
 from toolkit.plugins import *
+from .types import *
 import json
 
 def build_param_message(missing_params):
@@ -9,20 +10,7 @@ def build_param_message(missing_params):
 def build_param_type_message(invalid_params):
 	return "The following parameters were of the wrong type: {0}".format(", ".join(invalid_params))
 
-
 class Param(object):
-
-	class TYPE(Enum):
-		BLOB = 'blob'
-		FILE = 'file'
-		NUMBER = 'number'
-		STRING = 'string'
-		OBJECT = 'object'
-		BLOB_ARRAY = 'blob[]'
-		FILE_ARRAY = 'file[]'
-		NUMBER_ARRAY = 'number[]'
-		STRING_ARRAY = 'string[]'
-		OBJECT_ARRAY = 'object[]'
 
 	def __init__(self, name, type, required=True, default=None):
 		self.name = name
@@ -32,7 +20,7 @@ class Param(object):
 
 	@property
 	def is_multipart(self):
-		return self.type == Param.TYPE.BLOB_ARRAY or self.type == Param.TYPE.FILE_ARRAY
+		return self.type is Types.BLOB_ARRAY or self.type is Types.FILE_ARRAY
 
 	@property
 	def key(self):
@@ -40,17 +28,15 @@ class Param(object):
 
 	@property
 	def is_serialized(self):
-		return self.type in [
-			Param.TYPE.NUMBER,
-			Param.TYPE.STRING,
-			Param.TYPE.OBJECT,
-			Param.TYPE.NUMBER_ARRAY,
-			Param.TYPE.STRING_ARRAY,
-			Param.TYPE.OBJECT_ARRAY
+		return self.type not in [
+			Types.BLOB,
+			Types.FILE,
+			Types.BLOB_ARRAY,
+			Types.FILE_ARRAY
 		]
 
 	def dictify(self):
-		definition = {'name': self.name, 'type': self.type.value, 'required': self.required}
+		definition = {'name': self.name, 'type': self.type.value.representation, 'required': self.required}
 		if self.default: definition['default'] = self.default
 		return definition
 
@@ -77,17 +63,17 @@ class Param(object):
 @Plugin(key='command_name', module='commands')
 class CommandHandlerBase(AjaxMixin):
 
+	# a list of params.
+	params = []
+
 	# the canonical name for the command
 	command_name = ''
 
 	# whether or not the command requires a user to be authenticated
 	auth_required = False
 
-	# a list of params.
-	params = []
-
 	# a list of required user permissions for a command
-	required_permissions = []
+	permissions = []
 
 	# checks that the user on the request is logged in if 'authenticated' is a necessary permission
 	@classmethod
@@ -98,13 +84,13 @@ class CommandHandlerBase(AjaxMixin):
 	# checks that the user on the request has the necessary permissions for the command
 	@classmethod
 	def validate_permissions(cls, request):
-		return request.user.has_perms(cls.required_permissions)
+		return request.user.has_perms(cls.permissions)
 
 
 	# checks that the necessary parameters were provided with the command data
 	@classmethod
-	def validate_param_existence(cls, command_data):
-		missing = [param.name for param in cls.params if (param.required) and (param.key not in command_data)]
+	def validate_param_existence(cls, data):
+		missing = [param.name for param in cls.params if (param.required) and (param.key not in data)]
 		if len(missing) > 0: return False, build_param_message(missing)
 		return True, ''
 
@@ -117,47 +103,35 @@ class CommandHandlerBase(AjaxMixin):
 
 	# checks that all of the parameters in the request are of the correct type
 	@classmethod
-	def validate_param_types(cls, command_data):
+	def validate_param_types(cls, data):
 		invalid = []
-		resultant_typed_params = {}
-		existing = [param for param in cls.params if param.key in command_data]
+		cleaned_data = {}
+		existing = [param for param in cls.params if param.key in data]
 		for param in existing:
 
-			# getting the appropriate version of the request
+			# getting the appropriate set from the request data
 			if param.is_multipart:
-				values = command_data.getlist(param.key)
+				content = data.getlist(param.key)
 			else:
-				values = json.loads(command_data[param.key])
+				content = data[param.key]
 
-			try:
-				if param.type == Param.TYPE.BLOB:
-					resultant_typed_params[param.name] = values
-				elif param.type == Param.TYPE.FILE:
-					resultant_typed_params[param.name] = values
-				elif param.type == Param.TYPE.NUMBER:
-					resultant_typed_params[param.name] = float(values)
-				elif param.type == Param.TYPE.STRING:
-					resultant_typed_params[param.name] = str(values)
-				elif param.type == Param.TYPE.OBJECT:
-					resultant_typed_params[param.name] = dict(values)
-				elif param.type == Param.TYPE.BLOB_ARRAY:
-					resultant_typed_params[param.name] = list(values)
-				elif param.type == Param.TYPE.FILE_ARRAY:
-					resultant_typed_params[param.name] = list(values)
-				elif param.type == Param.TYPE.NUMBER_ARRAY:
-					resultant_typed_params[param.name] = list(map(float, values))
-				elif param.type == Param.TYPE.STRING_ARRAY:
-					resultant_typed_params[param.name] = list(map(str, values))
-				elif param.type == Param.TYPE.OBJECT_ARRAY:
-					resultant_typed_params[param.name] = list(map(dict, values))
-				else:
-					invalid.append(param.name)
-			except TypeError:
+			# if that type is generally serialized, then deserialize it
+			if param.is_serialized:
+				content = json.loads(content)
+
+			# check if it's valid according to that type
+			if not param.type.value.is_valid(content):
 				invalid.append(param.name)
+			else:
+				try:
+					cleaned_data[param.name] = param.type.value.cast(content)
+				except TypeError:
+					invalid.append(param.name)
+			
 		if len(invalid) > 0: return False, build_param_type_message(invalid)
-		else: return True, resultant_typed_params
+		else: return True, cleaned_data
 
 
 	# just a placeholder, but implementations should handle the actual incoming command and return a HTTP response
-	def handle(self, request, command_data):
+	def handle(self, request, data):
 		raise NotImplementedError("The default handle method was not overridden by the custom handler.")

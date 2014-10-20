@@ -38,7 +38,7 @@ class CommandService(AjaxMixin):
 	def dispatch(self, request, command_data):
 
 		# make sure they actually specified a command in the request
-		if not 'command' in request.POST:
+		if not 'command' in command_data:
 			return self.error("No command parameter was received.", status=400)
 
 		# retrieving the name of the command
