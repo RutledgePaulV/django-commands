@@ -19,21 +19,8 @@ class Param(object):
 		self.required = required
 
 	@property
-	def is_multipart(self):
-		return self.type is Types.BLOB_ARRAY or self.type is Types.FILE_ARRAY
-
-	@property
-	def key(self):
-		return "{0}[]".format(self.name) if self.is_multipart else self.name
-
-	@property
 	def is_serialized(self):
-		return self.type not in [
-			Types.BLOB,
-			Types.FILE,
-			Types.BLOB_ARRAY,
-			Types.FILE_ARRAY
-		]
+		return self.type not in [Types.BLOB, Types.FILE]
 
 	def dictify(self):
 		definition = {'name': self.name, 'type': self.type.value.representation, 'required': self.required}
@@ -90,7 +77,7 @@ class CommandHandlerBase(AjaxMixin):
 	# checks that the necessary parameters were provided with the command data
 	@classmethod
 	def validate_param_existence(cls, data):
-		missing = [param.name for param in cls.params if (param.required) and (param.key not in data)]
+		missing = [param.name for param in cls.params if (param.required) and (param.name not in data)]
 		if len(missing) > 0: return False, build_param_message(missing)
 		return True, ''
 
@@ -106,14 +93,11 @@ class CommandHandlerBase(AjaxMixin):
 	def validate_param_types(cls, data):
 		invalid = []
 		cleaned_data = {}
-		existing = [param for param in cls.params if param.key in data]
+		existing = [param for param in cls.params if param.name in data]
 		for param in existing:
 
 			# getting the appropriate set from the request data
-			if param.is_multipart:
-				content = data.getlist(param.key)
-			else:
-				content = data[param.key]
+			content = data[param.name]
 
 			# if that type is generally serialized, then deserialize it
 			if param.is_serialized:

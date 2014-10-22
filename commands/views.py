@@ -16,7 +16,7 @@ class CommandHandler(View, AjaxMixin):
 
 	def post(self, request, *args, **kwargs):
 		# dispatch the request to the appropriate handler along with a mutable copy of the POST contents
-		return self.service.dispatch(request, request.POST.copy())
+		return self.service.dispatch(request)
 
 '''
 	This controller is responsible for describing the commands

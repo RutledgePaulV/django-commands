@@ -20,9 +20,7 @@ var _ = (function (_) {
 		 */
 		TYPES: {
 			'blob': [Blob],
-			'blob[]': [Array, Blob],
 			'file': [File],
-			'file[]': [Array, File],
 			'string': [String],
 			'string[]': [Array, String],
 			'integer': [Number],

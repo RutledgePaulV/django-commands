@@ -1,4 +1,5 @@
 from enum import Enum, unique
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 # a decorator for converting a singular type into the array version
 def array(cls):
@@ -34,15 +35,11 @@ class Blob(ParamTypeBase):
 	representation = 'blob'
 
 	def is_valid(value):
-		return True
+		return isinstance(value, InMemoryUploadedFile)
 
 	def cast(value):
 		return value
 
-@array
-class BlobArray(ParamTypeBase):
-
-	representation = 'blob[]'
 
 class File(ParamTypeBase):
 
@@ -53,10 +50,6 @@ class File(ParamTypeBase):
 
 	def cast(value):
 		return value
-
-@array
-class FileArray(ParamTypeBase):
-	representation = 'file[]'
 
 
 class Float(ParamTypeBase):
@@ -116,9 +109,7 @@ class ObjectArray(Object):
 @unique
 class Types(Enum):
 	BLOB = Blob
-	BLOB_ARRAY = BlobArray
 	FILE = File
-	FILE_ARRAY = FileArray
 	FLOAT = Float
 	FLOAT_ARRAY = FloatArray
 	INTEGER = Integer
