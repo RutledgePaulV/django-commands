@@ -11,7 +11,7 @@ your existing apps, django-commands removes the need to have the same
 sort of redundant boilerplate validation for views intended to handle ajax requests.
 Ultimately, it allows operations to be more driven by the business
 logic of the application and less bound to models like what is often
-seen when taking a RESTful approach.
+seen today in CRUD scaffolding demos and the like.
 
 ## Why
 Ajax gets messy and model-bound API routes are not always
@@ -20,8 +20,8 @@ than struggling through the boilerplate view definition and basic validation
 of a request, django-commands allows you to focus solely on your business logic
 because you can be sure that anything that reaches your #handle method was
 valid in terms of parameter existence, parameter type, user authentication,
-and user permissions. It's only up to you to decide if it's valid based on model 
-existence and your business rules.
+and user permissions. It's only up to you to decide if it's valid based on your 
+business rules.
 
 ## Goals
 - Do not impede performance to any sort of noticeable level.
@@ -38,18 +38,21 @@ existence and your business rules.
 - Allow commands to take arbitrary amount of keys consisting of data of 
   the following types and correctly upload them, pass thorough validation, 
   and reach the handler in a directly usable format.
-  - String
-  - String Arrays
-  - Number
-  - Number Arrays
-  - Object*
-  - Object* Arrays
-  - File
-  - File Arrays
   - Blob
-  - Blob Arrays
+  - File
+  - String
+  - Float
+  - Integer
+  - Object*
+  - String Array
+  - Float Array
+  - Integer Array
+  - Object* Array
 
-_*Object types consist of a standard JavaScript object that combines any number of the other types using string keys_
+_*For django-commands, object types consist of a standard JavaScript object that
+may combine any of the other types except for Blobs and Files. Currently there
+is no specification for expressing nested types requirements, so specifying the
+object type only guarantees you'll receive a dictionary in the command handler._
 
 ## Installation
 
@@ -85,6 +88,7 @@ a simple example below.
 
 ```python
 from commands.base import *
+from commands.types import *
 from .models import *
 
 class MyCommandHandler(CommandHandlerBase):
@@ -94,16 +98,16 @@ class MyCommandHandler(CommandHandlerBase):
 
 	# parameters that are required in order to be considered a valid command request
 	params = [
-		Param('number', Param.TYPE.NUMBER),
-		Param('message', Param.TYPE.STRING),
-		Param('counts', Param.TYPE.NUMBER_ARRAY)
+		Param('number', Types.INTEGER),
+		Param('message', Types.STRING),
+		Param('counts', Types.INTEGER_ARRAY)
 	]
 
 	# request won't even make it to the handle method if they aren't authenticated
     auth_required = True
     
     # request won't even make it to the handle method if they don't have the permissions listed.
-    required_permissions = ['superuser']
+    permissions = ['superuser']
     
     # if all validation based on the static fields passes, then this class is instantiated
     # and the request and the appropriate data is passed into the command_data
@@ -163,15 +167,3 @@ var errorHandler = function(data){
 _.registry.SOME_CANONICAL_COMMAND_NAME.fire(data, successHandler, errorHandler);
 
 ```
-
-## License
-Copyright (c) 2014, Paul V Rutledge
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
