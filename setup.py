@@ -13,17 +13,14 @@ setup(
 	author="Paul Rutledge",
 	author_email="paul.v.rutledge@gmail.com",
 	description="A django app that provides a plugin type model for integrating the front and backend.",
-	license="MIT",
+	license="BSD",
 	keywords="django command strategy plugin",
 	url="https://github.com/RutledgePaulV/django-commands",
 	include_package_data=True,
 	long_description=README,
-	packages=["commands", "tests"],
-	install_requires = [
-		"django-toolkit"
-	],
+	packages=["commands"],
 	dependency_links=[
-		"https://github.com/RutledgePaulV/django-toolkit.git#egg=django-toolkit"
+		"git+https://github.com/RutledgePaulV/django-toolkit"
 	],
 	classifiers=[
 		'Environment :: Web Environment',
