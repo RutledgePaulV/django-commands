@@ -1,7 +1,7 @@
 {% load staticfiles %}
 <script src="{% static 'commands/commandDefinition.js' %}"></script>
 <script src="{% static 'commands/commandValidation.js' %}"></script>
-<script src="{% static 'commands/commandBuilder.js' %}"></script>
+<script src="{% static 'commands/commandAjax.js' %}"></script>
 <script src="{% static 'commands/commandService.js' %}"></script>
 <script>
 	_.Endpoints.available = "{% url 'commands:available' %}";

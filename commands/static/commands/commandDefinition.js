@@ -13,33 +13,14 @@ var _ = (function (_) {
 	 * @param {string} name The command key that the server will respond to.
 	 * @param {object.<string,*>} [params] The required parameters for the command.
 	 * @param {object.<string,*>} [defaults] Any defaults that should be applied.
+	 * @param {string} [endpoint] The endpoint that the command should hit when fired.
 	 * @constructor
 	 */
-	_.Command = function (name, params, defaults) {
+	_.Command = function (name, params, defaults, endpoint) {
 		this.name = name.toUpperCase();
 		this.params = params || {};
 		this.defaults = defaults || {};
-	};
-
-	/**
-	 * A factory method to take a backend result from the list of available commands
-	 * and generate a command object out of it.
-	 *
-	 * @param {object} def
-	 * @returns {Command}
-	 */
-	_.Command.fromServer = function (def) {
-		var params = {}, defaults = {};
-		for (var index in def.params) {
-			if (def.params.hasOwnProperty(index)) {
-				var param = def.params[index];
-				params[param.name] = {type: param.type, required: param.required};
-				if (param.default !== undefined) {
-					defaults[param.name] = param.default;
-				}
-			}
-		}
-		return new _.Command(def.name, params, defaults);
+		this.endpoint = endpoint || '';
 	};
 
 	/**
@@ -57,7 +38,15 @@ var _ = (function (_) {
 		 * @param {function} [failure]
 		 */
 		fire: function (data, success, failure) {
-			_.ExecuteCommand(this, data, success, failure);
+			data = this.build(data || {});
+			if (_.Validation.validateCommand(this, data)) {
+				success = success || function (data) {console.log(data);};
+				_.post(this.endpoint, data).done(success).fail(failure);
+			} else {
+				var message = this.toMessage(data);
+				if (failure) {failure(new Error(message));}
+				else {console.error(message);}
+			}
 		},
 
 		/**
@@ -67,10 +56,24 @@ var _ = (function (_) {
 		 * @param data
 		 * @returns {object}
 		 */
-		buildData: function (data) {
+		build: function (data) {
 			var commandData = $.extend(true, {}, this.defaults, data);
 			commandData.command = this.name;
 			return commandData;
+		},
+
+
+		/**
+		 * Builds a message to dump to the console comparing a command definition
+		 * and the provided data so that a developer can debug why it failed.
+		 *
+		 * @param {object} data
+		 * @returns {string}
+		 */
+		toMessage: function(data) {
+			var message = "The provided command definition was: " + this.toString();
+			message += "\nThe provided data was: " + JSON.stringify(data);
+			return message;
 		},
 
 		/**

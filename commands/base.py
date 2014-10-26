@@ -36,16 +36,18 @@ class Param(object):
 
 	2) perform existence and type validation of the data in the request
 
-	3) check that the user has appropriate permissions to make a request for the
+	3) check that the user is authenticated if it is required for the request
+
+	4) check that the user has appropriate permissions to make a request for the
 	   execution of a particular command
 
-	4) provide a basic definition of the command to the front end so that
-	   it can perform validation upfront and also minimize the number of
+	5) provide a basic definition of the command to the front end so that
+	   it can perform validation upfront and minimize the number of
 	   synchronization points between front end code and backend, since
 	   the backend drives the available commands for the front end as well.
 
 	The last thing that this class provides, is simply a #handle method that should
-	be overridden in each of the command handlers in order actually process a request.
+	be overridden in each of the command handlers in order to actually process a request.
 '''
 @Plugin(key='command_name', module='commands')
 class CommandHandlerBase(AjaxMixin):

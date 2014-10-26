@@ -15,7 +15,7 @@ var _ = (function(_){
 	 * @param {object} obj
 	 * @returns {FormData}
 	 */
-	_.buildData = function(obj){
+	_.buildPayload = function(obj){
 		var form = new FormData();
 		for(var key in obj){
 			var entry = obj[key];
@@ -33,7 +33,7 @@ var _ = (function(_){
 
 	/**
 	 * We're defining our own version of jQuery's post method that will
-	 * process the data according to our own buildData method instead of
+	 * process the data according to our own build method instead of
 	 * only stringifying everything.
 	 *
 	 * @param {string} uri
@@ -41,7 +41,7 @@ var _ = (function(_){
 	 * @returns {jQuery.xhr}
 	 */
 	_.post = function(uri, data){
-		payload = this.buildData(data);
+		var payload = this.buildPayload(data);
 	    return $.ajax({
 	        url: uri,
 	        type: "POST",
