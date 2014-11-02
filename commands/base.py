@@ -12,6 +12,12 @@ def build_param_type_message(invalid_params):
 	return "The following parameters were of the wrong type: {0}".format(", ".join(invalid_params))
 
 class Param(object):
+	"""
+		A param object defines some properties about each parameter that
+		may be passed during a command request. The information contained
+		herein is used for validation as well as for attribute naming on
+		the data objects that get passed around.
+	"""
 
 	def __init__(self, name, type, required=True, default=None):
 		self.name = name
@@ -29,29 +35,29 @@ class Param(object):
 		return definition
 
 
-'''
-	This CommandHandlerBase class contains the bulk of dealing with the static data
-	associated with a CommandHandler. The static fields allow us to:
-
-	1) dispatch to the appropriate CommandHandler,
-
-	2) perform existence and type validation of the data in the request
-
-	3) check that the user is authenticated if it is required for the request
-
-	4) check that the user has appropriate permissions to make a request for the
-	   execution of a particular command
-
-	5) provide a basic definition of the command to the front end so that
-	   it can perform validation upfront and minimize the number of
-	   synchronization points between front end code and backend, since
-	   the backend drives the available commands for the front end as well.
-
-	The last thing that this class provides, is simply a #handle method that should
-	be overridden in each of the command handlers in order to actually process a request.
-'''
 @Plugin(key='command_name', module='commands')
 class CommandHandlerBase(AjaxMixin):
+	"""
+		This CommandHandlerBase class contains the bulk of dealing with the static data
+		associated with a CommandHandler. The static fields allow us to:
+
+		1) dispatch to the appropriate CommandHandler,
+
+		2) perform existence and type validation of the data in the request
+
+		3) check that the user is authenticated if it is required for the request
+
+		4) check that the user has appropriate permissions to make a request for the
+		   execution of a particular command
+
+		5) provide a basic definition of the command to the front end so that
+		   it can perform validation upfront and minimize the number of
+		   synchronization points between front end code and backend, since
+		   the backend drives the available commands for the front end as well.
+
+		The last thing that this class provides, is simply a #handle method that should
+		be overridden in each of the command handlers in order to actually process a request.
+	"""
 
 	# a list of params.
 	params = []
@@ -64,7 +70,6 @@ class CommandHandlerBase(AjaxMixin):
 
 	# a list of required user permissions for a command
 	permissions = []
-
 
 	# checks that the user on the request is logged in if 'authenticated' is a necessary permission
 	@classmethod
@@ -84,6 +89,12 @@ class CommandHandlerBase(AjaxMixin):
 		missing = [param.name for param in cls.params if (param.required) and (param.name not in data)]
 		if len(missing) > 0: return False, build_param_message(missing)
 		return True, ''
+
+
+	# returns a list of the validator functions that have been defined in the class
+	@classmethod
+	def get_validators(cls):
+		return [func for func in cls.__dict__.values() if getattr(func, 'validator', False)]
 
 
 	# gets a simple serializable definition of the command
@@ -123,13 +134,16 @@ class CommandHandlerBase(AjaxMixin):
 	# runs any custom validators that were defined on the class for individual fields
 	@classmethod
 	def perform_custom_validation(cls, data):
-		results = {}
-		valid = True
-		funcs = [func for func in cls.__dict__.values() if hasattr(func, 'validator')]
-		for func in funcs:
-			if not func(getattr(data, func.key)):
-				valid = False
-				results[func.key] = func.error
+		results, valid = {}, True
+		for func in cls.get_validators():
+			if hasattr(data, func.key):
+				valid = func(getattr(data, func.key))
+				if not valid:
+					if not func.key in results:
+						results[func.key] = [func.error]
+					else:
+						results[func.key].append(func.error)
+
 		return valid, results
 
 	# just a placeholder, but implementations should handle the actual incoming command and return a HTTP response
