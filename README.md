@@ -89,6 +89,7 @@ a simple example below.
 ```python
 from commands.base import *
 from commands.types import *
+from commands.decorators import *
 from .models import *
 
 class MyCommandHandler(CommandHandlerBase):
@@ -113,16 +114,15 @@ class MyCommandHandler(CommandHandlerBase):
     # and the request and the appropriate data is passed into the command_data
 	def handle(self, request, data):
    
-        instances = MyModel.objects.filter(number = data.number)
-        
-        if instances.exists():
-            instance = instances[0]
-            instance.message = data.message
-            instance.sum = sum(data.counts)
-            instance.save()
-            return self.success({'responseMessage': 'Woohoo! You win!'})
-        else:
-            return self.error("No model existed for the provided number.")
+        instance = MyModel.objects.get(number = data.number)
+        instance.message = data.message
+        instance.sum = sum(data.counts)
+        instance.save()
+        return self.success({'responseMessage': 'Woohoo! You win!'})
+    
+    @validator('number', 'The number parameter cannot be negative.')
+    def validate_number(number):
+        return number >= 0
 ```
 
 ### Include Static Files
