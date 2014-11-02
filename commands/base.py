@@ -65,11 +65,6 @@ class CommandHandlerBase(AjaxMixin):
 	# a list of required user permissions for a command
 	permissions = []
 
-	# on instantiation we create a registry of all the validator methods so they don't have to be looked
-	# up each time.
-	def __init__(self):
-		self.validators = [func for func in self.__class__.__dict__.values() if hasattr(func, 'validator')]
-
 
 	# checks that the user on the request is logged in if 'authenticated' is a necessary permission
 	@classmethod
