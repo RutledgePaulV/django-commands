@@ -160,7 +160,7 @@ var data = {number: 5, message: 'my message', counts: [5, 6, 7]};
 
 // if status==200 on the response (they called return self.success())
 var successHandler = function(data){
-	alert(data.results[0].responseMessage); // alerts Woohoo! You Win!
+	alert(data.result.responseMessage); // alerts Woohoo! You Win!
 }
 
 // if status!=200 on the response (they called return self.error() or validation failed)
