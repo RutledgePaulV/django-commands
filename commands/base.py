@@ -109,6 +109,8 @@ class CommandHandlerBase(AjaxMixin):
 		invalid = []
 		cleaned_data = {}
 		existing = [param for param in cls.params if param.name in data]
+		[cleaned_data.setdefault(param.name, None) for param in cls.params if not param.name in data]
+
 		for param in existing:
 
 			# getting the appropriate set from the request data
@@ -126,7 +128,7 @@ class CommandHandlerBase(AjaxMixin):
 					cleaned_data[param.name] = param.type.value.cast(content)
 				except TypeError:
 					invalid.append(param.name)
-			
+
 		if len(invalid) > 0: return False, build_param_type_message(invalid)
 		else: return True, cleaned_data
 
