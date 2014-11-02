@@ -138,8 +138,9 @@ class CommandHandlerBase(AjaxMixin):
 	def perform_custom_validation(cls, data):
 		results, valid = {}, True
 		for func in cls.get_validators():
-			if hasattr(data, func.key):
-				valid = func(getattr(data, func.key))
+			value = getattr(data, func.key, None)
+			if value != None:
+				valid = func(value)
 				if not valid:
 					if not func.key in results:
 						results[func.key] = [func.error]
