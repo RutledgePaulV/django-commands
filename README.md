@@ -120,6 +120,11 @@ class MyCommandHandler(CommandHandlerBase):
         instance.save()
         return self.success({'responseMessage': 'Woohoo! You win!'})
     
+   
+    # you can implement @validator decorated methods for some additional validation
+    # prior to instantiation / reaching the #handle method. Here we check that number
+    # is not negative
+   
     @validator('number', 'The number parameter cannot be negative.')
     def validate_number(number):
         return number >= 0
@@ -166,4 +171,14 @@ var errorHandler = function(data){
 // making the actual call with data and callbacks
 _.registry.SOME_CANONICAL_COMMAND_NAME.fire(data, successHandler, errorHandler);
 
+
+// What if number was negative?
+errorHandler = function(data){
+    alert(data.errors['number']);
+}
+
+data.number = -1;
+
+// This will alert: 'The number parameter cannot be negative.'
+_.registry.SOME_CANONICAL_COMMAND_NAME.fire(data, successHandler, errorHandler);
 ```
