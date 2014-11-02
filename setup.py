@@ -19,12 +19,6 @@ setup(
 	include_package_data=True,
 	long_description=README,
 	packages=["commands", "tests"],
-	install_requires = [
-		"django-toolkit"
-	],
-	dependency_links=[
-		"https://github.com/RutledgePaulV/django-toolkit.git#egg=django-toolkit"
-	],
 	classifiers=[
 		'Environment :: Web Environment',
 		'Framework :: Django',

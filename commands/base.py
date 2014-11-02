@@ -1,7 +1,8 @@
 from enum import Enum
 from .mixins import *
-from toolkit.plugins import *
 from .types import *
+from .decorators import *
+import inspect
 import json
 
 def build_param_message(missing_params):
@@ -64,6 +65,12 @@ class CommandHandlerBase(AjaxMixin):
 	# a list of required user permissions for a command
 	permissions = []
 
+	# on instantiation we create a registry of all the validator methods so they don't have to be looked
+	# up each time.
+	def __init__(self):
+		self.validators = [func for func in self.__class__.__dict__.values() if hasattr(func, 'validator')]
+
+
 	# checks that the user on the request is logged in if 'authenticated' is a necessary permission
 	@classmethod
 	def validate_auth(cls, request):
@@ -117,6 +124,18 @@ class CommandHandlerBase(AjaxMixin):
 		if len(invalid) > 0: return False, build_param_type_message(invalid)
 		else: return True, cleaned_data
 
+
+	# runs any custom validators that were defined on the class for individual fields
+	@classmethod
+	def perform_custom_validation(cls, data):
+		results = {}
+		valid = True
+		funcs = [func for func in cls.__dict__.values() if hasattr(func, 'validator')]
+		for func in funcs:
+			if not func(getattr(data, func.key)):
+				valid = False
+				results[func.key] = func.error
+		return valid, results
 
 	# just a placeholder, but implementations should handle the actual incoming command and return a HTTP response
 	def handle(self, request, data):
