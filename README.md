@@ -24,17 +24,12 @@ and user permissions. It's only up to you to decide if it's valid based on your
 business rules.
 
 ## Goals
-- Do not impede performance to any sort of noticeable level.
 - Keep the implementation of a command handler simple, explicit, and elegant.
 - Make command strategy a viable approach to doing rapid and robust web development with django.
 - Should be no reason to have to venture outside of the command handler strategy for any
   form posts or ajax procedures within an application.
 - Perform thorough validation of a request on front-end and back-end so that
   developers get immediate and telling feedback.
-- Keep JavaScript lightweight and follow best practices regarding defining
-  a library.
-- Write clean, robust, well-documented, and well-tested code that makes
-  django-commands more than a one-off project.
 - Allow commands to take arbitrary amount of keys consisting of data of 
   the following types and correctly upload them, pass thorough validation, 
   and reach the handler in a directly usable format.
