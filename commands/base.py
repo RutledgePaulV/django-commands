@@ -139,7 +139,7 @@ class CommandHandlerBase(AjaxMixin):
 		results, valid = {}, True
 		for func in cls.get_validators():
 			value = getattr(data, func.key, None)
-			if value != None:
+			if value is not None:
 				valid = func(cls, value)
 				if not valid:
 					if not func.key in results:
