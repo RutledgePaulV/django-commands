@@ -60,8 +60,7 @@ var _ = (function (_) {
 	 * @private
 	 */
 	var errorUpdatingCallback = $.proxy(function (error) {
-		alert('An error was encountered while retrieving available commands. Logging error to console.');
-		console.error(error);
+		console.error(new Error(error));
 	}, _);
 
 
@@ -89,7 +88,7 @@ var _ = (function (_) {
 			}
 		};
 
-		$.get(_.Endpoints.available).done(done).fail(fail);
+		return $.get(_.Endpoints.available).done(done).fail(fail);
 	};
 
 	return _;

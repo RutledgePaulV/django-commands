@@ -97,6 +97,12 @@ class CommandHandlerBase(AjaxMixin):
 		return [func for func in cls.__dict__.values() if getattr(func, 'validator', False)]
 
 
+	# returns a list of the normalizer functions that have been defined in the class
+	@classmethod
+	def get_normalizers(cls):
+		return [func for func in cls.__dict__.values() if getattr(func, 'normalizer', False)]
+
+
 	# gets a simple serializable definition of the command
 	@classmethod
 	def to_definition(cls):
@@ -148,6 +154,23 @@ class CommandHandlerBase(AjaxMixin):
 						results[func.key].append(func.error)
 
 		return valid, results
+
+
+	# runs any normalizers that were defined on the class for individual fields
+	@classmethod
+	def perform_data_normalization(cls, data):
+		errors, valid = {}, True
+		for func in cls.get_normalizers():
+			value = getattr(data, func.key, None)
+			if value is not None:
+				try:
+					setattr(data, func.key, func(cls, value))
+				except Exception:
+					invalid[func.key] = 'Error occurred during normalization of {0}.'.format(func.key)
+					valid = False
+
+		return data, valid, errors
+
 
 	# just a placeholder, but implementations should handle the actual incoming command and return a HTTP response
 	def handle(self, request, data):
