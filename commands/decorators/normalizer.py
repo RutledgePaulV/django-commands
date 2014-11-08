@@ -12,4 +12,4 @@ class normalizer(object):
 	def __call__(self, func):
 		func.normalizer = True
 		func.key = self.key
-		return classmethod(func)
+		return func
