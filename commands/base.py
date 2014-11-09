@@ -71,6 +71,11 @@ class CommandHandlerBase(AjaxMixin):
 	# a list of required user permissions for a command
 	permissions = []
 
+	# defining a base init method to maintain the initial request and user as a field
+	def __init__(self, request):
+		self.request = request
+		self.user = self.request.user
+
 	# checks that the user on the request is logged in if 'authenticated' is a necessary permission
 	@classmethod
 	def validate_auth(cls, request):
@@ -139,14 +144,28 @@ class CommandHandlerBase(AjaxMixin):
 		else: return True, cleaned_data
 
 
-	# runs any custom validators that were defined on the class for individual fields
-	@classmethod
-	def perform_custom_validation(cls, data):
-		results, valid = {}, True
-		for func in cls.get_validators():
+	# runs any normalizers that were defined on the class for individual fields
+	def perform_data_normalization(self, data):
+		errors, valid = {}, True
+		for func in self.get_normalizers():
 			value = getattr(data, func.key, None)
 			if value is not None:
-				valid = func(cls, value)
+				try:
+					setattr(data, func.key, func(self, value))
+				except Exception:
+					invalid[func.key] = 'Error occurred during normalization of {0}.'.format(func.key)
+					valid = False
+
+		return data, valid, errors
+
+
+	# runs any custom validators that were defined on the class for individual fields
+	def perform_custom_validation(self, data):
+		results, valid = {}, True
+		for func in self.get_validators():
+			value = getattr(data, func.key, None)
+			if value is not None:
+				valid = func(self, value)
 				if not valid:
 					if not func.key in results:
 						results[func.key] = [func.error]
@@ -156,22 +175,6 @@ class CommandHandlerBase(AjaxMixin):
 		return valid, results
 
 
-	# runs any normalizers that were defined on the class for individual fields
-	@classmethod
-	def perform_data_normalization(cls, data):
-		errors, valid = {}, True
-		for func in cls.get_normalizers():
-			value = getattr(data, func.key, None)
-			if value is not None:
-				try:
-					setattr(data, func.key, func(cls, value))
-				except Exception:
-					invalid[func.key] = 'Error occurred during normalization of {0}.'.format(func.key)
-					valid = False
-
-		return data, valid, errors
-
-
 	# just a placeholder, but implementations should handle the actual incoming command and return a HTTP response
-	def handle(self, request, data):
+	def handle(self, data):
 		raise NotImplementedError("The default handle method was not overridden by the custom handler.")

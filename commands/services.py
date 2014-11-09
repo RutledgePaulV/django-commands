@@ -72,14 +72,6 @@ class CommandService(AjaxMixin):
 		# creating an object with an attribute for each of the command params since type validation was okay
 		data = type(command_name, (object,), result)()
 
-		# performing any normalization prior to running custom validators and instantiating handler
-		normalized_data, valid, errors = handler_class.perform_data_normalization(data)
-		if not valid: return self.errors(errors)
-
-		# performing any last validation based on custom validation methods defined on the handler
-		valid, result = handler_class.perform_custom_validation(normalized_data)
-		if not valid: return self.errors(result)
-
 		'''
 		Once we get here, everything that can be known outside of the specific business logic
 		for their request has been validated. It is still possible for the command to not
@@ -88,7 +80,15 @@ class CommandService(AjaxMixin):
 		'''
 
 		# nothing more can be done off of the static class definition, so go ahead and instantiate
-		handler = handler_class()
+		handler = handler_class(request)
+
+		# performing any normalization prior to running custom validators and instantiating handler
+		normalized_data, valid, errors = handler.perform_data_normalization(data)
+		if not valid: return self.errors(errors)
+
+		# performing any last validation based on custom validation methods defined on the handler
+		valid, result = handler.perform_custom_validation(normalized_data)
+		if not valid: return self.errors(result)
 
 		# pass responsibility off to the actual handle method
-		return handler.handle(request, normalized_data)
+		return handler.handle(normalized_data)
