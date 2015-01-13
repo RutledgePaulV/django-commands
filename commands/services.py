@@ -72,10 +72,6 @@ class CommandService(AjaxMixin):
 		# creating an object with an attribute for each of the command params since type validation was okay
 		data = type(command_name, (object,), result)()
 
-		# performing any last validation based on custom validation methods defined on the handler
-		valid, result = handler_class.perform_custom_validation(data)
-		if not valid: return self.errors(result)
-
 		'''
 		Once we get here, everything that can be known outside of the specific business logic
 		for their request has been validated. It is still possible for the command to not
