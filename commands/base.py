@@ -167,7 +167,7 @@ class CommandHandlerBase(AjaxMixin):
 			
 			if value is not None:
 				valid = func(self, value)
-			elif func.key.lower() == 'user'.lower()
+			elif func.key.lower() == 'user':
 				valid = func(self, self.user)
 			else:
 				valid = False
