@@ -40,13 +40,37 @@ var _ = (function (_) {
 		fire: function (data, success, failure) {
 			data = this.build(data || {});
 			if (_.Validation.validateCommand(this, data)) {
-				success = success || function (data) {console.log(data);};
-				_.post(this.endpoint, data).done(success).fail(failure);
+
+				var promise = _.post(this.endpoint, data);
+
+				if(success){
+					promise.done(success);
+				}
+
+				if(failure){
+					promise.fail(failure);
+				}
+
+				return promise;
 			} else {
 				var message = this.toMessage(data);
 				if (failure) {failure(new Error(message));}
 				else {console.error(message);}
+				return null;
 			}
+		},
+
+		/**
+		 * A method for testing a command during development.
+		 * It simply takes the response and logs it to the console.
+		 *
+		 * @param {object} [data] The data with which to initiate the command.
+		 * @returns {*}
+		 */
+		test: function(data){
+			var successHandler = function(data){console.log(data)};
+			var failureHandler = function(data){console.error(data)};
+			return this.fire(data, successHandler, failureHandler);
 		},
 
 		/**

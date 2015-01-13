@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
 	name="django-commands",
-	version="0.1",
+	version="0.6",
 	author="Paul Rutledge",
 	author_email="paul.v.rutledge@gmail.com",
 	description="A django app that provides a plugin type model for integrating the front and backend.",
@@ -29,6 +29,7 @@ setup(
 		'Programming Language :: Python :: 3',
 		'Programming Language :: Python :: 3.2',
 		'Programming Language :: Python :: 3.3',
+		'Programming Language :: Python :: 3.4',
 		'Topic :: Internet :: WWW/HTTP',
 		'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
 	],

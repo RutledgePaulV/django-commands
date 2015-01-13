@@ -5,9 +5,9 @@ class AjaxMixin(object):
 
 	@staticmethod
 	def success(results, meta=None, status=200):
-		if isinstance(results, list):
+		if isinstance(results, list) or isinstance(results, tuple):
 			content = {'results': results}
-		elif isinstance(results, dict) or results is not None:
+		elif results is not None:
 			content = {'result': results}
 		else:
 			content = {}
