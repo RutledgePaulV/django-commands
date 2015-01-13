@@ -54,6 +54,11 @@ may combine any of the other types except for Blobs and Files. Currently there
 is no specification for expressing nested types requirements, so specifying the
 object type only guarantees you'll receive a dictionary in the command handler._
 
+## Be Aware
+- 'user' is a reserved parameter name. The user for a given request will be available
+under self.user inside of a command handler #handle method. Validators for 'user' can
+be implemented and will be called appropriately.
+
 ## Installation
 
 ### Get the package
@@ -112,7 +117,7 @@ class MyCommandHandler(CommandHandlerBase):
     
     # if all validation based on the static fields passes, then this class is instantiated
     # and the request and the appropriate data is passed into the command_data
-	def handle(self, request, data):
+	def handle(self, data):
    
         instance = MyModel.objects.get(number = data.number)
         instance.message = data.message

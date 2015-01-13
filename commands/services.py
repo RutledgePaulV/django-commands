@@ -73,7 +73,7 @@ class CommandService(AjaxMixin):
 		data = type(command_name, (object,), result)()
 
 		# performing any last validation based on custom validation methods defined on the handler
-		valid, result = handler_class.perform_custom_validation(data)
+		valid, result = handler_class.perform_custom_validation(data, request.user)
 		if not valid: return self.errors(result)
 
 		'''

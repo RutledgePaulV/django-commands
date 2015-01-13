@@ -135,16 +135,19 @@ class CommandHandlerBase(AjaxMixin):
 
 	# runs any custom validators that were defined on the class for individual fields
 	@classmethod
-	def perform_custom_validation(cls, data):
+	def perform_custom_validation(cls, data, user):
 		results, valid = {}, True
 		for func in cls.get_validators():
 			if hasattr(data, func.key):
 				valid = func(getattr(data, func.key))
-				if not valid:
-					if not func.key in results:
-						results[func.key] = [func.error]
-					else:
-						results[func.key].append(func.error)
+			elif func.key == 'user':
+				valid = func(user)
+			if not valid:
+				if not func.key in results:
+					results[func.key] = [func.error]
+				else:
+					results[func.key].append(func.error)
+
 
 		return valid, results
 
