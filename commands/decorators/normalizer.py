@@ -13,4 +13,5 @@ class normalizer(object):
 	def __call__(self, func):
 		func.normalizer = True
 		func.key = self.key
+		func.order = self.order
 		return func

@@ -15,4 +15,5 @@ class validator(object):
 		func.validator = True
 		func.key = self.key
 		func.error = self.error
+		func.order = self.order
 		return func
