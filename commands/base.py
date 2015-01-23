@@ -99,13 +99,13 @@ class CommandHandlerBase(AjaxMixin):
 	# returns a list of the validator functions that have been defined in the class
 	@classmethod
 	def get_validators(cls):
-		return [func for func in cls.__dict__.values() if getattr(func, 'validator', False)]
+		return sorted([func for func in cls.__dict__.values() if getattr(func, 'validator', False)], key=lambda validator: validator.order)
 
 
 	# returns a list of the normalizer functions that have been defined in the class
 	@classmethod
 	def get_normalizers(cls):
-		return [func for func in cls.__dict__.values() if getattr(func, 'normalizer', False)]
+		return sorted([func for func in cls.__dict__.values() if getattr(func, 'normalizer', False)], key=lambda normalizer: normalizer.order)
 
 
 	# gets a simple serializable definition of the command
