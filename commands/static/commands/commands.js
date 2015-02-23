@@ -367,12 +367,22 @@ define(['module', 'jquery'], function (module, $) {
 		return $.get(_.Endpoints.available).done(done).fail(fail);
 	};
 
-	$.ajax({
-		url: _.Endpoints.available,
-		success: doneUpdatingCallback,
-		error: errorUpdatingCallback,
-		async: false
-	});
+	var initialLoad = function () {
+		$.ajax({
+			url: _.Endpoints.available,
+			success: doneUpdatingCallback,
+			error: errorUpdatingCallback,
+			async: false
+		});
+	};
+
+
+	if(module.config().hasOwnProperty('init')){
+		module.config().init(initialLoad);
+	} else {
+		initialLoad();
+	}
+
 
 	return _;
 });
