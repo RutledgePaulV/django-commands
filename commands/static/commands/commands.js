@@ -289,8 +289,8 @@ define(['module', 'jquery'], function (module, $) {
 	 * @type {{available: string, execution: string}}
 	 */
 	_.Endpoints = {
-		available: module.config().availableUrl(),
-		execution: module.config().executionUrl()
+		available: module.config().availableUrl,
+		execution: module.config().executionUrl
 	};
 
 
