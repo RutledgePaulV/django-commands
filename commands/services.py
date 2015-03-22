@@ -82,7 +82,7 @@ class CommandService(AjaxMixin):
 		# nothing more can be done off of the static class definition, so go ahead and instantiate
 		handler = handler_class(request)
 
-		# performing any normalization prior to running custom validators and instantiating handler
+		# performing any normalization prior to running custom validators
 		normalized_data, valid, errors = handler.perform_data_normalization(data)
 		if not valid: return self.errors(errors)
 

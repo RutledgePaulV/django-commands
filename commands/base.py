@@ -1,8 +1,6 @@
-from enum import Enum
 from .mixins import *
 from .types import *
 from .decorators import *
-import inspect
 import json
 
 def build_param_message(missing_params):
@@ -153,7 +151,7 @@ class CommandHandlerBase(AjaxMixin):
 				try:
 					setattr(data, func.key, func(self, value))
 				except Exception:
-					invalid[func.key] = 'Error occurred during normalization of {0}.'.format(func.key)
+					errors[func.key] = 'Error occurred during normalization of {0}.'.format(func.key)
 					valid = False
 
 		return data, valid, errors
