@@ -1,3 +1,11 @@
+import inspect
+
+def is_instance_method(method):
+	number_of_args = len(inspect.getargspec(method)[0])
+	if number_of_args > 2:
+		raise ValueError('Functions may only take one (static method) or two (instance method) arguments.')
+	return number_of_args == 2
+
 class validator(object):
 	"""
 		The validator decorator is a method decorator that specifies
@@ -16,4 +24,5 @@ class validator(object):
 		func.key = self.key
 		func.error = self.error
 		func.order = self.order
+		func.is_instance = is_instance_method(func)
 		return func

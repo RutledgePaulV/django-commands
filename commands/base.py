@@ -183,7 +183,7 @@ class CommandHandlerBase(AjaxMixin):
 
 	# used to dispatch calls appropriately from bound and unbound (imported/static) functions
 	def call_func(self, func, value):
-		if hasattr(func, '__self__'):
+		if getattr(func, 'is_instance', False):
 			return func(self, value)
 		else:
 			return func(value)
