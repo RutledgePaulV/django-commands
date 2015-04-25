@@ -6,10 +6,10 @@ class validator(object):
 		if the validation fails.
 	"""
 
-	def __init__(self, key, error, *args, **kwargs):
+	def __init__(self, key, error, order=0, *args, **kwargs):
 		self.key = key
 		self.error = error
-		self.order = kwargs['order'] if 'order' in kwargs else 0
+		self.order = order
 
 	def __call__(self, func):
 		func.validator = True

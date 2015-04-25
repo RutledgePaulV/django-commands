@@ -188,6 +188,17 @@
          * @enum {function(data):boolean}
          */
         _validators: {
+            'boolean': function(data) {
+				return (typeof data) === 'boolean';
+            },
+	        'boolean[]': function(data) {
+		        if (!Array.isArray(data)) {
+                    return false;
+                }
+                return data.every(function (entry) {
+                    return this.boolean(entry);
+                }, this);
+	        },
             'blob': function (data) {
                 return (data instanceof Blob);
             },
@@ -325,7 +336,7 @@
      * This is the success function from a command definition retrieval.
      * It will populate the registry with defined commands.
      *
-     * @param {{name:string,required:{name:string, type:string}[]}[]} results
+     * @param {{name:string,required:{name:string, type:string}[]}[]} response
      * @private
      */
     var doneUpdatingCallback = function (response) {

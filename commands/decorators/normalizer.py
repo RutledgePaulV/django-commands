@@ -6,9 +6,9 @@ class normalizer(object):
 		to custom validation and use inside of a command handler
 	"""
 
-	def __init__(self, key, *args, **kwargs):
+	def __init__(self, key, order=0, *args, **kwargs):
 		self.key = key
-		self.order = kwargs['order'] if 'order' in kwargs else 0
+		self.order = order
 
 	def __call__(self, func):
 		func.normalizer = True

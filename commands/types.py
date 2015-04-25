@@ -106,10 +106,26 @@ class Object(ParamTypeBase):
 class ObjectArray(Object):
 	representation = 'object[]'
 
+class Boolean(ParamTypeBase):
+	representation = 'boolean'
+
+	def is_valid(value):
+		return isinstance(value, bool)
+
+	def cast(value):
+		return value
+
+@array
+class BooleanArray(Boolean):
+	representation = 'boolean[]'
+
+
 @unique
 class Types(Enum):
 	BLOB = Blob
 	FILE = File
+	BOOLEAN = Boolean
+	BOOLEAN_ARRAY = BooleanArray
 	FLOAT = Float
 	FLOAT_ARRAY = FloatArray
 	INTEGER = Integer

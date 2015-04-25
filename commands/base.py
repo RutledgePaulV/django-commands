@@ -149,7 +149,8 @@ class CommandHandlerBase(AjaxMixin):
 			value = getattr(data, func.key, None)
 			if value is not None:
 				try:
-					setattr(data, func.key, func(self, value))
+					normalized = self.call_func(func, value)
+					setattr(data, func.key, normalized)
 				except Exception:
 					errors[func.key] = 'Error occurred during normalization of {0}.'.format(func.key)
 					valid = False
@@ -164,9 +165,9 @@ class CommandHandlerBase(AjaxMixin):
 			value = getattr(data, func.key, None)
 			
 			if value is not None:
-				valid = func(self, value)
+				valid = self.call_func(func, value)
 			elif func.key.lower() == 'user':
-				valid = func(self, self.user)
+				valid = self.call_func(func, self.user)
 			else:
 				valid = False
 				results[func.key] = ['Parameter {0} could not be mapped from the data.'.format(func.key)]
@@ -178,6 +179,15 @@ class CommandHandlerBase(AjaxMixin):
 					results[func.key].append(func.error)
 						
 		return valid, results
+
+
+	# used to dispatch calls appropriately from bound and unbound (imported/static) functions
+	def call_func(self, func, value):
+		if hasattr(func, '__self__'):
+			return func(self, value)
+		else:
+			return func(value)
+
 
 	# just a placeholder, but implementations should handle the actual incoming command and return a HTTP response
 	def handle(self, data):
