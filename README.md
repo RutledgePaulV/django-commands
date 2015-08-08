@@ -205,6 +205,7 @@ In your base template:
 
 
 Then, in your requirejs configuration:
+```javascript
 require.config({
 
 		paths: {
@@ -220,3 +221,4 @@ require.config({
 		},
    	//...
 });
+```
