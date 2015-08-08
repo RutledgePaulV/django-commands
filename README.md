@@ -3,7 +3,8 @@ Django-commands is a reusable django app that helps idiot-proof and
 simplify the process of writing client-side and server-side
 code for communicating via ajax. A command handler is a replacement 
 for the standard django view and is intended to deal strictly with ajax 
-requests in json format.
+requests. Requests are actually sent as form data so that files and params
+can be sent together. Params will be json encoded, files will be left as is.
 
 ## How
 By using a plugin-architecture and auto-discovery of modules across
@@ -11,10 +12,11 @@ your existing apps, django-commands removes the need to have the same
 sort of redundant boilerplate validation for views intended to handle ajax requests.
 Ultimately, it allows operations to be more driven by the business
 logic of the application and less bound to models like what is often
-seen today in CRUD scaffolding demos and the like.
+seen today in CRUD scaffolding demos and the like. Note that it is NOT restful. Instead
+it follows a pattern known as RPC (remote procedure call).
 
 ## Why
-Ajax gets messy and model-bound API routes are not always
+Ajax gets messy and resource-bound RESTful API routes are not always
 the best solution for applications with more complex business logic. Rather
 than struggling through the boilerplate view definition and basic validation
 of a request, django-commands allows you to focus solely on your business logic
@@ -38,10 +40,12 @@ business rules.
   - String
   - Float
   - Integer
+  - Boolean
   - Object*
   - String Array
   - Float Array
   - Integer Array
+  - Boolean Array
   - Object* Array
 
 _*For django-commands, object types consist of a standard JavaScript object that
@@ -58,7 +62,7 @@ be implemented and will be called appropriately.
 
 ### Get the package
 ```bash
-pip install git+https://github.com/RutledgePaulV/django-commands.git
+pip install django-commands
 ```
 
 ### Register as an installed application
@@ -66,7 +70,7 @@ pip install git+https://github.com/RutledgePaulV/django-commands.git
 #settings.py
 INSTALLED_APPS = (
 	...
-	'django-commands',
+	'commands',
 )
 ```
 
@@ -144,8 +148,9 @@ assume that you are already using jQuery.
 // this will make the front-end aware of all the available
 // commands that you've defined in commands.py files across
 // all of your apps. All available commands (based on user permissions
-// and authentication status will be populated into _.registry
-_.UpdateDefinition();
+// and authentication status will be populated into the global commands object.
+// note, this only needs to be done if you don't predefine the available commands (see below with AMD)
+commands.UpdateDefinition();
 
 // this will attempt to post the command to your handler,
 // but first it will do some checks to make sure you have
@@ -153,7 +158,7 @@ _.UpdateDefinition();
 // right type. This validation occurs on the front end
 // and on the backend. This call without data won't work
 // for the command that we defined.
-_.registry.SOME_CANONICAL_COMMAND_NAME.fire();
+commands.SOME_CANONICAL_COMMAND_NAME.fire();
 
 // defining legitimate data
 var data = {number: 5, message: 'my message', counts: [5, 6, 7]};
@@ -169,7 +174,7 @@ var errorHandler = function(data){
 }
 
 // making the actual call with data and callbacks
-_.registry.SOME_CANONICAL_COMMAND_NAME.fire(data, successHandler, errorHandler);
+commands.SOME_CANONICAL_COMMAND_NAME.fire(data, successHandler, errorHandler);
 
 
 // What if number was negative?
@@ -180,5 +185,38 @@ errorHandler = function(data){
 data.number = -1;
 
 // This will alert: 'The number parameter cannot be negative.'
-_.registry.SOME_CANONICAL_COMMAND_NAME.fire(data, successHandler, errorHandler);
+commands.SOME_CANONICAL_COMMAND_NAME.fire(data, successHandler, errorHandler);
 ```
+
+
+### AMD
+Django commands also supports loading via AMD by following the universal module definition pattern. Note that you also preload the available commands on the page by using the ```{% commands %}``` template tag and setting it equal to a variable.
+
+In your base template:
+```jinja2
+{% load commands %}
+
+...
+
+<script>
+	var MY_GLOBAL_VARIABLE = {% commands %};
+</script>
+```
+
+
+Then, in your requirejs configuration:
+require.config({
+
+		paths: {
+			'commands': 'commands/commands'
+		}
+   	//...
+		config: {
+			commands: {
+				availableUrl: '/commands/available/',
+				executionUrl: '/commands/',
+				commands: MY_GLOBAL_VARIABLE.commands
+			}
+		},
+   	//...
+});
