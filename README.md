@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/django-commands.svg)](https://badge.fury.io/py/django-commands)
+
 ## What
 Django-commands is a reusable django app that helps idiot-proof and
 simplify the process of writing client-side and server-side
