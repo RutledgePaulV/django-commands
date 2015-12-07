@@ -27,11 +27,12 @@ business rules.
 
 ## Goals
 - Keep the implementation of a command handler simple, explicit, and elegant.
-- Make command strategy a viable approach to doing rapid and robust web development with django.
 - Should be no reason to have to venture outside of the command handler strategy for any
   form posts or ajax procedures within an application.
 - Perform thorough validation of a request on front-end and back-end so that
   developers get immediate and telling feedback.
+- Developers should not have to write boilerplate JavaScript to get access to their
+  commands. We have enough information to generate a simple JS client.
 - Allow commands to take arbitrary amount of keys consisting of data of 
   the following types and correctly upload them, pass thorough validation, 
   and reach the handler in a directly usable format.
@@ -69,7 +70,6 @@ pip install django-commands
 ```python
 #settings.py
 INSTALLED_APPS = (
-	...
 	'commands',
 )
 ```
@@ -98,17 +98,17 @@ from .models import *
 
 class MyCommandHandler(CommandHandlerBase):
 
-	# the name of the command
-	command_name = 'SOME_CANONICAL_COMMAND_NAME'
+    # the name of the command
+    command_name = 'SOME_CANONICAL_COMMAND_NAME'
 
-	# parameters that are required in order to be considered a valid command request
-	params = [
-		Param('number', Types.INTEGER),
-		Param('message', Types.STRING),
-		Param('counts', Types.INTEGER_ARRAY)
-	]
+    # parameters that are required in order to be considered a valid command request
+    params = [
+        Param('number', Types.INTEGER),
+        Param('message', Types.STRING),
+        Param('counts', Types.INTEGER_ARRAY)
+    ]
 
-	# request won't even make it to the handle method if they aren't authenticated
+    # request won't even make it to the handle method if they aren't authenticated
     auth_required = True
     
     # request won't even make it to the handle method if they don't have the permissions listed.
@@ -116,7 +116,7 @@ class MyCommandHandler(CommandHandlerBase):
     
     # if all validation based on the static fields passes, then this class is instantiated
     # and the request and the appropriate data is passed into the command_data
-	def handle(self, data):
+    def handle(self, data):
    
         instance = MyModel.objects.get(number = data.number)
         instance.message = data.message
@@ -210,7 +210,7 @@ require.config({
 
 		paths: {
 			'commands': 'commands/commands'
-		}
+		},
    	//...
 		config: {
 			commands: {

@@ -353,7 +353,7 @@
             }
             exports[def.name] = new Command(def.name, params, defaults, exports.execution);
         });
-    }
+    };
 
 
     /**

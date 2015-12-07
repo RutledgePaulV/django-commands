@@ -1,9 +1,8 @@
 # This module defines a thread local singleton decorator for marking classes as such.
 
-from threading import local
-current_thread = local()
-
 def Singleton(clazz):
+
+	instances = {}
 
 	class Decorated(clazz):
 
@@ -41,6 +40,6 @@ def Singleton(clazz):
 			return cls.instance
 
 	# keep the singleton definition (and instance on thread local to prevent cross request pollution)
-	if not hasattr(current_thread,clazz.__name__):
-		setattr(current_thread, clazz.__name__, ClassObject())
-	return getattr(current_thread, clazz.__name__)
+	if not clazz.__name__ in instances:
+		instances[clazz.__name__] = ClassObject()
+	return instances[clazz.__name__]
